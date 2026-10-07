@@ -1,0 +1,184 @@
+<div class="container-fluid">
+   <div class="page-title d-flex justify-content-between align-items-center mb-3">
+      <div>
+         <h1 class="h3 mb-0"><i class="ti ti-qrcode me-2"></i>{{ __('Agent Config') }}</h1>
+         <div class="text-muted">{{ __('Preconfigure the GLPI Android Inventory agent with a QR code or a deep link.') }}</div>
+      </div>
+   </div>
+
+   <div class="row">
+      <div class="col-lg-7">
+         <div class="card mb-3">
+            <div class="card-header"><i class="ti ti-settings me-1"></i>{{ __('Agent configuration') }}</div>
+            <div class="card-body">
+               <form name="form" action="{{ path('/plugins/agentconfig/front/config.form.php') }}" method="post">
+                  <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
+
+                  <div class="mb-3">
+                     <label class="form-label">{{ __('GLPI URL (reachable from the device)') }}</label>
+                     <input type="url" class="form-control" name="server_url"
+                            value="{{ settings['server_url'] }}" placeholder="https://glpi.example.com">
+                     <div class="form-text">{{ __('Leave empty to use the GLPI general URL.') }}</div>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ __('TAG') }}</label>
+                        <input type="text" class="form-control" name="tag" value="{{ settings['tag'] }}">
+                     </div>
+                     <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ __('Equipment type') }}</label>
+                        <select class="form-select" name="asset_itemtype">
+                           <option value="Computer" {{ settings['asset_itemtype'] == 'Computer' ? 'selected' : '' }}>Computer</option>
+                           <option value="Phone" {{ settings['asset_itemtype'] == 'Phone' ? 'selected' : '' }}>Phone</option>
+                        </select>
+                     </div>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ __('Login') }}</label>
+                        <input type="text" class="form-control" name="login" value="{{ settings['login'] }}"
+                               autocomplete="off">
+                     </div>
+                     <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ __('Password') }}</label>
+                        <input type="password" class="form-control" name="password" value=""
+                               autocomplete="new-password"
+                               placeholder="{{ settings['password_enc'] ? __('Unchanged') : '' }}">
+                        <div class="form-text">{{ __('Leave empty to keep the current password.') }}</div>
+                     </div>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ __('Serial number (optional)') }}</label>
+                        <input type="text" class="form-control" name="asset_serial"
+                               value="{{ settings['asset_serial'] }}">
+                     </div>
+                     <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ __('Equipment name (optional)') }}</label>
+                        <input type="text" class="form-control" name="asset_name"
+                               value="{{ settings['asset_name'] }}">
+                     </div>
+                  </div>
+
+                  <div class="form-check mb-2">
+                     <input class="form-check-input" type="checkbox" name="auto_inventory" value="1"
+                            id="auto_inventory" {{ settings['auto_inventory'] ? 'checked' : '' }}>
+                     <label class="form-check-label" for="auto_inventory">
+                        {{ __('Automatic inventory on the device') }}
+                     </label>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ __('Inventory frequency') }}</label>
+                        <select class="form-select" name="frequency">
+                           {% for freq in ['Day', 'Week', 'Month'] %}
+                           <option value="{{ freq }}" {{ settings['frequency'] == freq ? 'selected' : '' }}>
+                              {{ freq }}
+                           </option>
+                           {% endfor %}
+                        </select>
+                     </div>
+                     <div class="col-md-6 mb-3 d-flex align-items-end">
+                        <div class="form-check mb-3">
+                           <input class="form-check-input" type="checkbox" name="start_on_boot" value="1"
+                                  id="start_on_boot" {{ settings['start_on_boot'] ? 'checked' : '' }}>
+                           <label class="form-check-label" for="start_on_boot">
+                              {{ __('Start inventory on boot') }}
+                           </label>
+                        </div>
+                     </div>
+                  </div>
+
+                  <hr>
+                  <h2 class="h6">{{ __('OAuth (inventory scope)') }}</h2>
+
+                  <div class="form-check mb-2">
+                     <input class="form-check-input" type="checkbox" name="oauth_enabled" value="1"
+                            id="oauth_enabled" {{ settings['oauth_enabled'] ? 'checked' : '' }}>
+                     <label class="form-check-label" for="oauth_enabled">
+                        {{ __('Send CLIENT_ID / CLIENT_SECRET to the agent') }}
+                     </label>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-6 mb-3">
+                        <label class="form-label">Client ID</label>
+                        <input type="text" class="form-control" name="oauth_client_id"
+                               value="{{ settings['oauth_client_id'] }}">
+                     </div>
+                     <div class="col-md-6 mb-3">
+                        <label class="form-label">Client secret</label>
+                        <input type="password" class="form-control" name="oauth_client_secret" value=""
+                               autocomplete="new-password"
+                               placeholder="{{ settings['oauth_client_secret_enc'] ? __('Unchanged') : '' }}">
+                     </div>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary" name="save" value="1">
+                     <i class="ti ti-device-floppy me-1"></i>{{ __('Save') }}
+                  </button>
+               </form>
+
+               <hr>
+
+               <form action="{{ path('/plugins/agentconfig/front/config.form.php') }}" method="post" class="d-inline">
+                  <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn btn-outline-secondary btn-sm" name="create_oauth" value="1">
+                     <i class="ti ti-key me-1"></i>{{ __('Create / reuse the OAuth client') }}
+                  </button>
+               </form>
+
+               <form action="{{ path('/plugins/agentconfig/front/config.form.php') }}" method="post" class="d-inline">
+                  <input type="hidden" name="_glpi_csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="inventory_oauth" value="{{ inventory_auth == 'client_credentials' ? '0' : '1' }}">
+                  <button type="submit" class="btn btn-sm {{ inventory_auth == 'client_credentials' ? 'btn-warning' : 'btn-outline-warning' }}"
+                          name="toggle_inventory_auth" value="1">
+                     <i class="ti ti-shield-lock me-1"></i>
+                     {{ inventory_auth == 'client_credentials'
+                        ? __('Disable OAuth-only inventory auth')
+                        : __('Require OAuth for inventory') }}
+                  </button>
+               </form>
+
+               <div class="form-text mt-2">
+                  {{ __('Current inventory authentication: %s')|format(inventory_auth) }}
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <div class="col-lg-5">
+         <div class="card mb-3">
+            <div class="card-header"><i class="ti ti-qrcode me-1"></i>{{ __('QR code') }}</div>
+            <div class="card-body text-center">
+               <img src="{{ qr_url }}" alt="{{ __('QR code') }}" style="width:260px;height:260px;"
+                    class="img-thumbnail mb-2">
+               <div>
+                  <a class="btn btn-sm btn-outline-primary" href="{{ dl_url }}">
+                     <i class="ti ti-download me-1"></i>{{ __('Download PNG') }}
+                  </a>
+               </div>
+            </div>
+         </div>
+
+         <div class="card mb-3">
+            <div class="card-header"><i class="ti ti-code me-1"></i>{{ __('Payload (base64)') }}</div>
+            <div class="card-body">
+               <textarea class="form-control" rows="4" readonly>{{ payload }}</textarea>
+            </div>
+         </div>
+
+         <div class="card mb-3">
+            <div class="card-header"><i class="ti ti-link me-1"></i>{{ __('Deep link') }}</div>
+            <div class="card-body">
+               <textarea class="form-control mb-2" rows="3" readonly>{{ deep_link }}</textarea>
+               <small class="text-muted d-block text-break">{{ deep_link }}</small>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

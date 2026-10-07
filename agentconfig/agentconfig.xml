@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugininfos>
+    <name>Agent Config</name>
+    <version>1.0.0</version>
+    <license>GPL-3.0-or-later</license>
+    <homepage>https://github.com/glpi-project</homepage>
+    <description>Preconfigure the GLPI Android Inventory agent with a QR code or a deep link (server URL, credentials, TAG, asset type, OAuth client, automatic inventory).</description>
+    <authors>Agent Config contributors</authors>
+    <minGlpiVersion>11.0.0</minGlpiVersion>
+    <is_official>0</is_official>
+</plugininfos>
